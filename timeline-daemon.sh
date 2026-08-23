@@ -7,9 +7,17 @@ STATE_FILE="$HOME/.local/state/omarchy/timeline-phase"
 SKIP_REFRESH="${TIMELINE_SKIP_REFRESH:-0}"
 
 get_phase() {
-  local hour=$(date +%H)
-  local minute=$(date +%M)
-  local time=$((hour * 60 + minute))
+  local hour minute time
+  if [[ -n "$TIMELINE_TEST_HOUR" ]]; then
+    hour=$TIMELINE_TEST_HOUR
+    minute=0
+  else
+    hour=$(date +%H)
+    minute=$(date +%M)
+  fi
+  hour=$((10#$hour))
+  minute=$((10#$minute))
+  time=$((hour * 60 + minute))
 
   # Sunrise: 5:00 - 7:00
   if (( time >= 300 && time < 420 )); then
