@@ -1,5 +1,5 @@
 #!/bin/bash
-# Timeline theme daemon — shifts Omarchy colors and backgrounds based on time of day
+# Timeline theme daemon — shifts Omarchy colors, backgrounds, unlock image, and cursor based on time of day
 # 8 phases: sunrise, morning, noon, afternoon, sunset, dusk, night, midnight
 
 THEME_DIR="$HOME/.config/omarchy/themes/timeline"
@@ -19,31 +19,46 @@ get_phase() {
   minute=$((10#$minute))
   time=$((hour * 60 + minute))
 
-  # Sunrise: 5:00 - 7:00
   if (( time >= 300 && time < 420 )); then
     echo "sunrise"
-  # Morning: 7:00 - 10:00
   elif (( time >= 420 && time < 600 )); then
     echo "morning"
-  # Noon: 10:00 - 13:00
   elif (( time >= 600 && time < 780 )); then
     echo "noon"
-  # Afternoon: 13:00 - 16:00
   elif (( time >= 780 && time < 960 )); then
     echo "afternoon"
-  # Sunset: 16:00 - 19:00
   elif (( time >= 960 && time < 1140 )); then
     echo "sunset"
-  # Dusk: 19:00 - 21:00
   elif (( time >= 1140 && time < 1260 )); then
     echo "dusk"
-  # Night: 21:00 - 24:00
   elif (( time >= 1260 && time < 1440 )); then
     echo "night"
-  # Midnight: 0:00 - 5:00
   else
     echo "midnight"
   fi
+}
+
+# Extract a color value from a phase colors file
+get_color() {
+  local file=$1 key=$2
+  grep "^${key} =" "$file" | head -1 | sed 's/.*= *"\(.*\)"/\1/'
+}
+
+# Crop/resize an image to 1920x1080 for unlock.png
+make_unlock() {
+  local src=$1 dest=$2
+  python3 -c "
+from PIL import Image
+im = Image.open('$src').convert('RGBA')
+target = (1920, 1080)
+scale = max(target[0]/im.width, target[1]/im.height)
+new_size = (int(im.width*scale), int(im.height*scale))
+im = im.resize(new_size, Image.LANCZOS)
+left = (im.width - target[0]) // 2
+top = (im.height - target[1]) // 2
+im = im.crop((left, top, left + target[0], top + target[1]))
+im.save('$dest', 'PNG')
+"
 }
 
 apply_phase() {
@@ -71,13 +86,34 @@ apply_phase() {
     omarchy theme bg set "$bg_file" 2>/dev/null
   fi
 
+  # Swap unlock.png from the phase background
+  if [[ -f "$bg_file" ]]; then
+    make_unlock "$bg_file" "$THEME_DIR/unlock.png"
+    # Regenerate preview-unlock with phase colors
+    local bg_color fg_color
+    bg_color=$(get_color "$phase_file" "background")
+    fg_color=$(get_color "$phase_file" "foreground")
+    omarchy plymouth preview "$bg_color" "$fg_color" \
+      "$THEME_DIR/unlock.png" "$THEME_DIR/preview-unlock.png" 2>/dev/null
+  fi
+
+  # Update cursor color to match phase accent
+  local accent_color
+  accent_color=$(get_color "$phase_file" "accent")
+  if [[ -n "$accent_color" ]]; then
+    local cursor_hook="$HOME/.config/omarchy/hooks/theme-set.d/cursor-theme-reflect.sh"
+    if [[ -f "$cursor_hook" ]]; then
+      "$cursor_hook" "timeline" 2>/dev/null
+    fi
+  fi
+
   # Save state
   mkdir -p "$(dirname "$STATE_FILE")"
   echo "$phase" > "$STATE_FILE"
 
   # Refresh theme (skip if headless)
   if [[ "$SKIP_REFRESH" != "1" ]]; then
-    OMARCHY_THEME_SKIP_BACKGROUND=1 omarchy theme refresh 2>/dev/null
+    omarchy theme refresh 2>/dev/null
   fi
 
   echo "Timeline: applied phase '$phase' at $(date '+%H:%M')"

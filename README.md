@@ -6,14 +6,14 @@ A **dynamic** desktop theme for [Omarchy](https://omarchy.org/) that shifts colo
 
 | Phase | Time | Palette | Background |
 | :--- | :--- | :--- | :--- |
-| 🌅 Sunrise | 5:00–7:00 | Soft pink/orange | Desert dawn |
-| ☀️ Morning | 7:00–10:00 | Golden warm | Sand dunes sunrise |
-| 🏜️ Noon | 10:00–13:00 | Bright warm light | Utah dunes |
-| 🌇 Afternoon | 13:00–16:00 | Deep warm | Sahara Acacus |
-| 🔥 Sunset | 16:00–19:00 | Orange/red dramatic | Desert sunset |
-| 🌆 Dusk | 19:00–21:00 | Purple/orange transition | Mojave twilight |
-| 🌙 Night | 21:00–24:00 | Dark warm deep | High Desert twilight |
-| 🌑 Midnight | 0:00–5:00 | Darkest warm black | Desert stars |
+| 🌅 Sunrise | 5:00–7:00 | Soft pink/orange | Flatirons sunrise |
+| ☀️ Morning | 7:00–10:00 | Golden warm | Serra da Canastra |
+| 🏜️ Noon | 10:00–13:00 | Bright warm light | Clear blue sky |
+| 🌇 Afternoon | 13:00–16:00 | Deep warm | Meadow grasses |
+| 🔥 Sunset | 16:00–19:00 | Orange/red dramatic | Paddy field sunset |
+| 🌆 Dusk | 19:00–21:00 | Purple/orange transition | Blue hour mountain |
+| 🌙 Night | 21:00–24:00 | Dark warm deep | Full moon night |
+| 🌑 Midnight | 0:00–5:00 | Darkest warm black | Milky Way panorama |
 
 ![Timeline Theme Preview](preview.png)
 
