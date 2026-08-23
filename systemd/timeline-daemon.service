@@ -1,0 +1,7 @@
+[Unit]
+Description=Timeline theme daemon — shift colors based on time of day
+
+[Service]
+Type=oneshot
+ExecStart=%h/.config/omarchy/themes/timeline/timeline-daemon.sh
+Environment=TIMELINE_SKIP_REFRESH=0
