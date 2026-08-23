@@ -97,23 +97,26 @@ apply_phase() {
       "$THEME_DIR/unlock.png" "$THEME_DIR/preview-unlock.png" 2>/dev/null
   fi
 
-  # Update cursor color to match phase accent
-  local accent_color
-  accent_color=$(get_color "$phase_file" "accent")
-  if [[ -n "$accent_color" ]]; then
-    local cursor_hook="$HOME/.config/omarchy/hooks/theme-set.d/cursor-theme-reflect.sh"
-    if [[ -f "$cursor_hook" ]]; then
-      "$cursor_hook" "timeline" 2>/dev/null
-    fi
-  fi
-
   # Save state
   mkdir -p "$(dirname "$STATE_FILE")"
   echo "$phase" > "$STATE_FILE"
 
-  # Refresh theme (skip if headless)
+  # Refresh theme — regenerates hyprland.lua, btop, neovim from colors.toml templates
   if [[ "$SKIP_REFRESH" != "1" ]]; then
     omarchy theme refresh 2>/dev/null
+  fi
+
+  # Recompile cursor with new accent — must delete tag to bypass fast-path
+  local accent_color cursor_slug cursor_tag
+  accent_color=$(get_color "$phase_file" "accent")
+  cursor_slug="Adwaita-timeline"
+  cursor_tag="$HOME/.local/share/icons/$cursor_slug/.color_tag"
+  if [[ -n "$accent_color" ]] && [[ -f "$cursor_tag" ]]; then
+    rm -f "$cursor_tag"
+  fi
+  local cursor_hook="$HOME/.config/omarchy/hooks/theme-set.d/cursor-theme-reflect.sh"
+  if [[ -f "$cursor_hook" ]]; then
+    "$cursor_hook" "timeline" 2>/dev/null
   fi
 
   echo "Timeline: applied phase '$phase' at $(date '+%H:%M')"
