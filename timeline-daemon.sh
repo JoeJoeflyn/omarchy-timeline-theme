@@ -61,6 +61,49 @@ im.save('$dest', 'PNG')
 "
 }
 
+# Generate hyprland.lua with phase accent + rounded corners + shadows
+make_hyprland() {
+  local accent=$1 inactive=$2 fg=$3 muted=$4 dest=$5
+  cat > "$dest" << LUA
+-- Timeline — Hyprland decoration: auto-generated, accent = $accent
+
+hl.config({
+  general = {
+    col = {
+      active_border = "rgb(${accent#\#})",
+      inactive_border = "rgb(${inactive#\#})",
+    },
+    gaps_in = 7,
+    gaps_out = 11,
+    border_size = 2,
+  },
+  group = {
+    col = {
+      border_active = "rgb(${accent#\#})",
+      border_inactive = "rgb(${inactive#\#})",
+    },
+    groupbar = {
+      col = {
+        active = "rgba(${accent#\#}99)",
+        inactive = "rgba(${inactive#\#}88)",
+      },
+      text_color = "rgb(${fg#\#})",
+      text_color_inactive = "rgba(${muted#\#}ee)",
+    },
+  },
+  decoration = {
+    rounding = 6,
+    rounding_power = 3,
+    shadow = {
+      enabled = true,
+      range = 16,
+      color = "rgba(00000088)",
+    },
+  },
+})
+LUA
+}
+
 apply_phase() {
   local phase=$1
   local phase_file="$THEME_DIR/colors-${phase}.toml"
@@ -80,6 +123,14 @@ apply_phase() {
 
   # Swap colors
   cp "$phase_file" "$THEME_DIR/colors.toml"
+
+  # Generate hyprland.lua with phase accent + rounded corners + shadows
+  local accent_color inactive_color fg_color muted_color
+  accent_color=$(get_color "$phase_file" "accent")
+  inactive_color=$(get_color "$phase_file" "lighter_background")
+  fg_color=$(get_color "$phase_file" "foreground")
+  muted_color=$(get_color "$phase_file" "muted")
+  make_hyprland "$accent_color" "$inactive_color" "$fg_color" "$muted_color" "$THEME_DIR/hyprland.lua"
 
   # Swap background if exists
   if [[ -f "$bg_file" ]]; then
@@ -101,7 +152,8 @@ apply_phase() {
   mkdir -p "$(dirname "$STATE_FILE")"
   echo "$phase" > "$STATE_FILE"
 
-  # Refresh theme — regenerates hyprland.lua, btop, neovim from colors.toml templates
+  # Refresh theme — regenerates btop, neovim from colors.toml templates,
+  # picks up our custom hyprland.lua with rounded corners
   if [[ "$SKIP_REFRESH" != "1" ]]; then
     omarchy theme refresh 2>/dev/null
   fi
