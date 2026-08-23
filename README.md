@@ -6,14 +6,14 @@ A **dynamic** desktop theme for [Omarchy](https://omarchy.org/) that shifts colo
 
 | Phase | Time | Palette | Background |
 | :--- | :--- | :--- | :--- |
-| 🌅 Sunrise | 5:00–7:00 | Soft pink/orange | Flatirons sunrise |
-| ☀️ Morning | 7:00–10:00 | Golden warm | Serra da Canastra |
-| 🏜️ Noon | 10:00–13:00 | Bright warm light | Clear blue sky |
-| 🌇 Afternoon | 13:00–16:00 | Deep warm | Meadow grasses |
-| 🔥 Sunset | 16:00–19:00 | Orange/red dramatic | Paddy field sunset |
-| 🌆 Dusk | 19:00–21:00 | Purple/orange transition | Blue hour mountain |
-| 🌙 Night | 21:00–24:00 | Dark warm deep | Full moon night |
-| 🌑 Midnight | 0:00–5:00 | Darkest warm black | Milky Way panorama |
+| 🌅 Sunrise | 5:00–7:00 | Soft pink/orange | Mt Fuji sunrise |
+| ☀️ Morning | 7:00–10:00 | Golden warm | Mt Fuji golden morning |
+| 🏜️ Noon | 10:00–13:00 | Bright warm light | Mt Fuji from Lake Yamanaka |
+| 🌇 Afternoon | 13:00–16:00 | Deep warm | Mt Fuji from ISS |
+| 🔥 Sunset | 16:00–19:00 | Orange/red dramatic | Mt Fuji sunset |
+| 🌆 Dusk | 19:00–21:00 | Purple/orange transition | Mt Fuji silhouette dusk |
+| 🌙 Night | 21:00–24:00 | Dark warm deep | Mt Fuji at night Kawaguchiko |
+| 🌑 Midnight | 0:00–5:00 | Darkest warm black | Fuji City lights from Mt Fuji |
 
 ![Timeline Theme Preview](preview.png)
 
