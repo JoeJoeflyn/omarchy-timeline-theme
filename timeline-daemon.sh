@@ -114,14 +114,14 @@ apply_phase() {
     return 1
   fi
 
-  # Check if phase already applied
+  # Check if phase already applied (skip unless forced)
   local current_phase=""
   [[ -f "$STATE_FILE" ]] && current_phase=$(cat "$STATE_FILE")
   if [[ "$current_phase" == "$phase" ]] && [[ "$TIMELINE_FORCE" != "1" ]]; then
     return 0
   fi
 
-  # Swap colors
+  # Always update theme dir files so they're correct when someone switches to timeline
   cp "$phase_file" "$THEME_DIR/colors.toml"
 
   # Generate hyprland.lua with phase accent + rounded corners + shadows
@@ -132,43 +132,82 @@ apply_phase() {
   muted_color=$(get_color "$phase_file" "muted")
   make_hyprland "$accent_color" "$inactive_color" "$fg_color" "$muted_color" "$THEME_DIR/hyprland.lua"
 
-  # Swap background if exists
-  if [[ -f "$bg_file" ]]; then
-    omarchy theme bg set "$bg_file" 2>/dev/null
-  fi
+  # Swap icon theme to match phase accent (folders/files match the accent)
+  local icon_theme
+  case "$phase" in
+    midnight)  icon_theme="Yaru-purple" ;;
+    sunrise)   icon_theme="Yaru-magenta" ;;
+    morning)   icon_theme="Yaru-yellow" ;;
+    noon)      icon_theme="Yaru-yellow" ;;
+    afternoon) icon_theme="Yaru-wartybrown" ;;
+    sunset)    icon_theme="Yaru-red" ;;
+    dusk)      icon_theme="Yaru-magenta" ;;
+    night)     icon_theme="Yaru-blue" ;;
+  esac
+  echo "$icon_theme" > "$THEME_DIR/icons.theme"
 
-  # Swap unlock.png from the phase background
+  # Update unlock.png in theme dir (used by actual lock screen)
   if [[ -f "$bg_file" ]]; then
     make_unlock "$bg_file" "$THEME_DIR/unlock.png"
-    # Regenerate preview-unlock with phase colors
-    local bg_color fg_color
-    bg_color=$(get_color "$phase_file" "background")
-    fg_color=$(get_color "$phase_file" "foreground")
-    omarchy plymouth preview "$bg_color" "$fg_color" \
-      "$THEME_DIR/unlock.png" "$THEME_DIR/preview-unlock.png" 2>/dev/null
   fi
 
   # Save state
   mkdir -p "$(dirname "$STATE_FILE")"
   echo "$phase" > "$STATE_FILE"
 
-  # Refresh theme — regenerates btop, neovim from colors.toml templates,
-  # picks up our custom hyprland.lua with rounded corners
-  if [[ "$SKIP_REFRESH" != "1" ]]; then
-    omarchy theme refresh 2>/dev/null
+  # If timeline isn't the active theme, just keep the theme dir updated.
+  # The live apply happens when the user switches to timeline (via the hook).
+  local active_theme=""
+  [[ -f "$HOME/.local/state/omarchy/current/theme.name" ]] && \
+    active_theme=$(cat "$HOME/.local/state/omarchy/current/theme.name")
+  if [[ "$active_theme" != "timeline" ]] && [[ "$TIMELINE_FORCE" != "1" ]]; then
+    echo "Timeline: pre-updated theme dir for phase '$phase' (not active theme)"
+    return 0
   fi
 
-  # Recompile cursor with new accent — must delete tag to bypass fast-path
-  local accent_color cursor_slug cursor_tag
-  accent_color=$(get_color "$phase_file" "accent")
-  cursor_slug="Adwaita-timeline"
-  cursor_tag="$HOME/.local/share/icons/$cursor_slug/.color_tag"
-  if [[ -n "$accent_color" ]] && [[ -f "$cursor_tag" ]]; then
-    rm -f "$cursor_tag"
+  # Fast phase switch: skip full omarchy theme refresh (7s) and only do
+  # what's visible — update state colors, hyprland.lua, bar IPC, cursor.
+  # Terminal/app configs (btop, neovim, etc.) update on next full theme set.
+  if [[ "$SKIP_REFRESH" != "1" ]]; then
+    local state_dir="$HOME/.local/state/omarchy/current/theme"
+    local next_dir="$HOME/.local/state/omarchy/current/next-theme"
+    # 1. Set background FIRST so it's ready before anything else
+    if [[ -f "$bg_file" ]]; then
+      omarchy theme bg set "$bg_file" 2>/dev/null
+    fi
+    # 2. Stage next-theme dir so template generator can read it
+    rm -rf "$next_dir"
+    mkdir -p "$next_dir"
+    cp "$phase_file" "$next_dir/colors.toml"
+    cp "$THEME_DIR/hyprland.lua" "$next_dir/hyprland.lua"
+    cp "$THEME_DIR/icons.theme" "$next_dir/icons.theme"
+    # 3. Generate shell.toml from template (fast — single file)
+    omarchy-theme-set-templates 2>/dev/null
+    # 4. Fix shell.toml: use accent for menu/launcher borders (not foreground)
+    sed -i "s/active-border-foreground = .*/active-border-foreground = \"$accent_color\"/" "$next_dir/shell.toml" 2>/dev/null
+    # 5. Swap into state
+    cp "$next_dir/colors.toml" "$state_dir/colors.toml"
+    cp "$next_dir/hyprland.lua" "$state_dir/hyprland.lua"
+    cp "$next_dir/shell.toml" "$state_dir/shell.toml" 2>/dev/null
+    cp "$next_dir/icons.theme" "$state_dir/icons.theme" 2>/dev/null
+    rm -rf "$next_dir"
+    # 6. Apply icon theme so file/folder colors match accent
+    gsettings set org.gnome.desktop.interface icon-theme "$icon_theme" 2>/dev/null
+    # 7. Send bar IPC so the top bar picks up new colors instantly
+    local colors_payload shell_payload
+    colors_payload=$(base64 -w 0 "$state_dir/colors.toml" 2>/dev/null)
+    shell_payload=$(base64 -w 0 "$state_dir/shell.toml" 2>/dev/null)
+    timeout 2 omarchy-shell shell applyTheme "$colors_payload" "$shell_payload" 2>/dev/null
+    # 8. Reload Hyprland so borders update
+    hyprctl reload >/dev/null 2>&1
   fi
+
+  # Switch to pre-compiled per-phase cursor slug so Hyprland actually
+  # reloads the cursor pixels (same name = Hyprland caches, no reload).
+  # All 8 slugs are pre-compiled so this is instant (fast-path).
   local cursor_hook="$HOME/.config/omarchy/hooks/theme-set.d/cursor-theme-reflect.sh"
   if [[ -f "$cursor_hook" ]]; then
-    "$cursor_hook" "timeline" 2>/dev/null
+    "$cursor_hook" "timeline-${phase}" 2>/dev/null
   fi
 
   echo "Timeline: applied phase '$phase' at $(date '+%H:%M')"
