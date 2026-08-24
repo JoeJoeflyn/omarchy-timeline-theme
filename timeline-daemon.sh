@@ -190,15 +190,18 @@ apply_phase() {
     cp "$next_dir/hyprland.lua" "$state_dir/hyprland.lua"
     cp "$next_dir/shell.toml" "$state_dir/shell.toml" 2>/dev/null
     cp "$next_dir/icons.theme" "$state_dir/icons.theme" 2>/dev/null
+    cp "$next_dir/chromium.theme" "$state_dir/chromium.theme" 2>/dev/null
     rm -rf "$next_dir"
     # 6. Apply icon theme so file/folder colors match accent
     gsettings set org.gnome.desktop.interface icon-theme "$icon_theme" 2>/dev/null
-    # 7. Send bar IPC so the top bar picks up new colors instantly
+    # 7. Update browser color (Brave/Chromium tab strip)
+    omarchy-theme-set-browser 2>/dev/null
+    # 8. Send bar IPC so the top bar picks up new colors instantly
     local colors_payload shell_payload
     colors_payload=$(base64 -w 0 "$state_dir/colors.toml" 2>/dev/null)
     shell_payload=$(base64 -w 0 "$state_dir/shell.toml" 2>/dev/null)
     timeout 2 omarchy-shell shell applyTheme "$colors_payload" "$shell_payload" 2>/dev/null
-    # 8. Reload Hyprland so borders update
+    # 9. Reload Hyprland so borders update
     hyprctl reload >/dev/null 2>&1
   fi
 
