@@ -203,8 +203,6 @@ apply_phase() {
     cp "$THEME_DIR/icons.theme" "$next_dir/icons.theme"
     # 3. Generate shell.toml from template (fast — single file)
     omarchy-theme-set-templates 2>/dev/null
-    # 4. Fix shell.toml: use accent for menu/launcher borders (not foreground)
-    sed -i "s/active-border-foreground = .*/active-border-foreground = \"$accent_color\"/" "$next_dir/shell.toml" 2>/dev/null
     # 5. Swap into state
     cp "$next_dir/colors.toml" "$state_dir/colors.toml"
     cp "$next_dir/hyprland.lua" "$state_dir/hyprland.lua"
