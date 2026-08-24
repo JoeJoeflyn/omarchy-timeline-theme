@@ -61,6 +61,26 @@ im.save('$dest', 'PNG')
 "
 }
 
+# Regenerate ghostty.conf from a phase colors file + the Omarchy template
+generate_ghostty_conf() {
+  local colors_file=$1 dest=$2
+  local tpl="/usr/share/omarchy/default/themed/ghostty.conf.tpl"
+  [[ -f "$tpl" ]] || return 0
+  python3 -c "
+import re
+colors = {}
+with open('$colors_file') as f:
+    for line in f:
+        m = re.match(r'^(\\w+)\\s*=\\s*\"?(#[0-9a-fA-F]+)\"?', line)
+        if m: colors[m.group(1)] = m.group(2)
+colors.setdefault('selection_background', colors.get('selection',''))
+colors.setdefault('selection_foreground', colors.get('bright_foreground',''))
+with open('$tpl') as f: tpl = f.read()
+for k,v in colors.items(): tpl = tpl.replace('{{ '+k+' }}', v)
+with open('$dest','w') as f: f.write(tpl)
+"
+}
+
 # Generate hyprland.lua with phase accent + rounded corners + shadows
 make_hyprland() {
   local accent=$1 inactive=$2 fg=$3 muted=$4 dest=$5
@@ -192,6 +212,9 @@ apply_phase() {
     cp "$next_dir/icons.theme" "$state_dir/icons.theme" 2>/dev/null
     cp "$next_dir/chromium.theme" "$state_dir/chromium.theme" 2>/dev/null
     rm -rf "$next_dir"
+    # 5b. Regenerate ghostty.conf from phase colors and reload Ghostty
+    generate_ghostty_conf "$phase_file" "$state_dir/ghostty.conf"
+    pkill -USR2 ghostty 2>/dev/null
     # 6. Apply icon theme so file/folder colors match accent
     gsettings set org.gnome.desktop.interface icon-theme "$icon_theme" 2>/dev/null
     # 7. Update browser color (Brave/Chromium tab strip)
