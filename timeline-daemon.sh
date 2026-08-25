@@ -81,7 +81,7 @@ with open('$dest','w') as f: f.write(tpl)
 "
 }
 
-# Generate hyprland.lua with phase accent + rounded corners + shadows
+# Generate hyprland.lua with phase accent + rounded corners
 make_hyprland() {
   local accent=$1 inactive=$2 fg=$3 muted=$4 dest=$5
   cat > "$dest" << LUA
@@ -114,11 +114,6 @@ hl.config({
   decoration = {
     rounding = 6,
     rounding_power = 3,
-    shadow = {
-      enabled = true,
-      range = 16,
-      color = "rgba(00000088)",
-    },
   },
 })
 LUA
@@ -144,7 +139,7 @@ apply_phase() {
   # Always update theme dir files so they're correct when someone switches to timeline
   cp "$phase_file" "$THEME_DIR/colors.toml"
 
-  # Generate hyprland.lua with phase accent + rounded corners + shadows
+  # Generate hyprland.lua with phase accent + rounded corners
   local accent_color inactive_color fg_color muted_color
   accent_color=$(get_color "$phase_file" "accent")
   inactive_color=$(get_color "$phase_file" "lighter_background")
