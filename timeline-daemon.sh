@@ -204,10 +204,17 @@ apply_phase() {
     cp "$next_dir/shell.toml" "$state_dir/shell.toml" 2>/dev/null
     cp "$next_dir/icons.theme" "$state_dir/icons.theme" 2>/dev/null
     cp "$next_dir/chromium.theme" "$state_dir/chromium.theme" 2>/dev/null
+    cp "$next_dir/btop.theme" "$state_dir/btop.theme" 2>/dev/null
+    cp "$next_dir/neovim.lua" "$state_dir/neovim.lua" 2>/dev/null
     rm -rf "$next_dir"
     # 5b. Regenerate ghostty.conf from phase colors and reload Ghostty
     generate_ghostty_conf "$phase_file" "$state_dir/ghostty.conf"
     pkill -USR2 ghostty 2>/dev/null
+    # 5c. Trigger btop config reload so it re-reads the symlinked theme file
+    # btop watches btop.conf via inotify; touching it reloads config + theme
+    if pgrep -x btop >/dev/null 2>&1; then
+      touch "$HOME/.config/btop/btop.conf" 2>/dev/null
+    fi
     # 6. Apply icon theme so file/folder colors match accent
     gsettings set org.gnome.desktop.interface icon-theme "$icon_theme" 2>/dev/null
     # 7. Update browser color (Brave/Chromium tab strip)
