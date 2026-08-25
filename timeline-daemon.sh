@@ -81,7 +81,7 @@ with open('$dest','w') as f: f.write(tpl)
 "
 }
 
-# Generate hyprland.lua with phase accent + rounded corners + shadows
+# Generate hyprland.lua with phase accent + rounded corners
 make_hyprland() {
   local accent=$1 inactive=$2 fg=$3 muted=$4 dest=$5
   cat > "$dest" << LUA
@@ -114,11 +114,6 @@ hl.config({
   decoration = {
     rounding = 6,
     rounding_power = 3,
-    shadow = {
-      enabled = true,
-      range = 16,
-      color = "rgba(00000088)",
-    },
   },
 })
 LUA
@@ -144,7 +139,7 @@ apply_phase() {
   # Always update theme dir files so they're correct when someone switches to timeline
   cp "$phase_file" "$THEME_DIR/colors.toml"
 
-  # Generate hyprland.lua with phase accent + rounded corners + shadows
+  # Generate hyprland.lua with phase accent + rounded corners
   local accent_color inactive_color fg_color muted_color
   accent_color=$(get_color "$phase_file" "accent")
   inactive_color=$(get_color "$phase_file" "lighter_background")
@@ -203,8 +198,6 @@ apply_phase() {
     cp "$THEME_DIR/icons.theme" "$next_dir/icons.theme"
     # 3. Generate shell.toml from template (fast — single file)
     omarchy-theme-set-templates 2>/dev/null
-    # 4. Fix shell.toml: use accent for menu/launcher borders (not foreground)
-    sed -i "s/active-border-foreground = .*/active-border-foreground = \"$accent_color\"/" "$next_dir/shell.toml" 2>/dev/null
     # 5. Swap into state
     cp "$next_dir/colors.toml" "$state_dir/colors.toml"
     cp "$next_dir/hyprland.lua" "$state_dir/hyprland.lua"
