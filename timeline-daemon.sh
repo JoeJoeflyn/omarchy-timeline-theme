@@ -77,6 +77,10 @@ colors.setdefault('selection_background', colors.get('selection',''))
 colors.setdefault('selection_foreground', colors.get('bright_foreground',''))
 with open('$tpl') as f: tpl = f.read()
 for k,v in colors.items(): tpl = tpl.replace('{{ '+k+' }}', v)
+# Use accent or cursor color for terminal cursor instead of bright_foreground
+cursor_color = colors.get('cursor') or colors.get('accent') or colors.get('bright_foreground','')
+if cursor_color:
+    tpl = re.sub(r'cursor-color = .*', 'cursor-color = ' + cursor_color.lstrip('#'), tpl)
 with open('$dest','w') as f: f.write(tpl)
 "
 }
