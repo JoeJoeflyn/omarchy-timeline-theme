@@ -245,6 +245,11 @@ apply_phase() {
     "$cursor_hook" "timeline-${phase}" 2>/dev/null
   fi
 
+  local kbd_hook="$HOME/.config/omarchy/hooks/theme-set.d/asus-tuf-kbd-sync.sh"
+  if [[ -x "$kbd_hook" ]]; then
+    "$kbd_hook" "timeline" 2>/dev/null
+  fi
+
   echo "Timeline: applied phase '$phase' at $(date '+%H:%M')"
 }
 
