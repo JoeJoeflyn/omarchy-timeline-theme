@@ -1,10 +1,10 @@
--- Timeline — Hyprland decoration: auto-generated, accent = #E25828
+-- Timeline — Hyprland decoration: auto-generated, accent = #D48838
 
 hl.config({
   general = {
     col = {
-      active_border = "rgb(E25828)",
-      inactive_border = "rgb(2A1814)",
+      active_border = "rgb(D48838)",
+      inactive_border = "rgb(2E2014)",
     },
     gaps_in = 7,
     gaps_out = 11,
@@ -12,16 +12,16 @@ hl.config({
   },
   group = {
     col = {
-      border_active = "rgb(E25828)",
-      border_inactive = "rgb(2A1814)",
+      border_active = "rgb(D48838)",
+      border_inactive = "rgb(2E2014)",
     },
     groupbar = {
       col = {
-        active = "rgba(E2582899)",
-        inactive = "rgba(2A181488)",
+        active = "rgba(D4883899)",
+        inactive = "rgba(2E201488)",
       },
-      text_color = "rgb(E8D4C4)",
-      text_color_inactive = "rgba(8A5040ee)",
+      text_color = "rgb(EDE0CC)",
+      text_color_inactive = "rgba(8A6A4Aee)",
     },
   },
   decoration = {

@@ -137,6 +137,11 @@ apply_phase() {
   local current_phase=""
   [[ -f "$STATE_FILE" ]] && current_phase=$(cat "$STATE_FILE")
   if [[ "$current_phase" == "$phase" ]] && [[ "$TIMELINE_FORCE" != "1" ]]; then
+    # Phase unchanged — still re-apply cursor so it survives post-boot hook overwrite
+    local cursor_hook="$HOME/.config/omarchy/hooks/theme-set.d/cursor-theme-reflect.sh"
+    if [[ -f "$cursor_hook" ]]; then
+      "$cursor_hook" "timeline-${phase}" 2>/dev/null
+    fi
     return 0
   fi
 
