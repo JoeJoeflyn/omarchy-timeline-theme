@@ -123,6 +123,106 @@ hl.config({
 LUA
 }
 
+# Generate shell.toml with phase colors for top bar, menus, launcher, popups
+make_shell() {
+  local bg=$1 fg=$2 accent=$3 dest=$4
+  cat > "$dest" << TOML
+# Omarchy Quattro surfaces for Timeline (auto-generated for current phase).
+
+[bar]
+background = "$bg"
+background-alpha = 1.0
+text = "$fg"
+active = "$accent"
+scale-with-font = true
+
+[hyprland]
+active-border = "$accent"
+active-border-foreground = "$accent"
+
+[popups]
+background = "$bg"
+background-alpha = 1.0
+text = "$fg"
+border = "hyprland.active-border"
+border-alpha = 1.0
+border-width = 2
+
+[tooltip]
+background = "$bg"
+background-alpha = 0.97
+text = "$fg"
+border = "hyprland.active-border-foreground"
+border-alpha = 1.0
+
+[notifications]
+background = "$bg"
+background-alpha = 1.0
+text = "$fg"
+border = "hyprland.active-border"
+border-alpha = 1.0
+border-width = 2
+countdown = "$accent"
+
+[launcher]
+background = "$bg"
+background-alpha = 0.95
+text = "$fg"
+border = "hyprland.active-border"
+border-alpha = 1.0
+border-width = 2
+scrim = "$bg"
+scrim-alpha = 0.5
+selected-background = "$fg"
+selected-background-alpha = 0.08
+selected-text = "$accent"
+selected-border = "hyprland.active-border"
+selected-border-alpha = 0.25
+
+[menu]
+background = "$bg"
+background-alpha = 1.0
+text = "$fg"
+border = "hyprland.active-border"
+border-alpha = 1.0
+border-width = 2
+scrim = "$bg"
+scrim-alpha = 0.5
+selected-background = "$fg"
+selected-background-alpha = 0.08
+selected-text = "$accent"
+selected-border = "hyprland.active-border"
+selected-border-alpha = 0.25
+
+[polkit]
+background = "$bg"
+background-alpha = 1.0
+text = "$fg"
+text-error = "$accent"
+border = "hyprland.active-border"
+border-error = "$accent"
+border-alpha = 1.0
+border-width = 2
+scrim = "$bg"
+scrim-alpha = 0.5
+accent = "$accent"
+
+[lock]
+background = "$bg"
+background-alpha = 0.8
+text = "$fg"
+placeholder = "${fg}B3"
+text-error = "$accent"
+border = "hyprland.active-border"
+border-active = "hyprland.active-border"
+border-error = "$accent"
+border-alpha = 1.0
+border-width = 2
+selection = "$accent"
+selection-alpha = 0.45
+TOML
+}
+
 apply_phase() {
   local phase=$1
   local phase_file="$THEME_DIR/colors-${phase}.toml"
@@ -149,12 +249,14 @@ apply_phase() {
   cp "$phase_file" "$THEME_DIR/colors.toml"
 
   # Generate hyprland.lua with phase accent + rounded corners
-  local accent_color inactive_color fg_color muted_color
+  local accent_color inactive_color fg_color muted_color bg_color
   accent_color=$(get_color "$phase_file" "accent")
   inactive_color=$(get_color "$phase_file" "lighter_background")
   fg_color=$(get_color "$phase_file" "foreground")
   muted_color=$(get_color "$phase_file" "muted")
+  bg_color=$(get_color "$phase_file" "background")
   make_hyprland "$accent_color" "$inactive_color" "$fg_color" "$muted_color" "$THEME_DIR/hyprland.lua"
+  make_shell "$bg_color" "$fg_color" "$accent_color" "$THEME_DIR/shell.toml"
 
   # Swap icon theme to match phase accent (folders/files match the accent)
   local icon_theme
@@ -207,10 +309,10 @@ apply_phase() {
     cp "$THEME_DIR/icons.theme" "$next_dir/icons.theme"
     # 3. Generate shell.toml from template (fast — single file)
     omarchy-theme-set-templates 2>/dev/null
+    cp "$THEME_DIR/shell.toml" "$state_dir/shell.toml" 2>/dev/null
     # 5. Swap into state
     cp "$next_dir/colors.toml" "$state_dir/colors.toml"
     cp "$next_dir/hyprland.lua" "$state_dir/hyprland.lua"
-    cp "$next_dir/shell.toml" "$state_dir/shell.toml" 2>/dev/null
     cp "$next_dir/icons.theme" "$state_dir/icons.theme" 2>/dev/null
     cp "$next_dir/chromium.theme" "$state_dir/chromium.theme" 2>/dev/null
     cp "$next_dir/btop.theme" "$state_dir/btop.theme" 2>/dev/null

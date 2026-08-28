@@ -1,93 +1,93 @@
-# Omarchy Quattro surfaces for Timeline.
+# Omarchy Quattro surfaces for Timeline (auto-generated for current phase).
 
 [bar]
-background = "#0E0A16"
+background = "#1E1610"
 background-alpha = 1.0
-text = "#D8D4E8"
-active = "#6858A8"
+text = "#EDE0CC"
+active = "#D48838"
 scale-with-font = true
 
 [hyprland]
-active-border = "#6858A8"
-active-border-foreground = "#D8D4E8"
+active-border = "#D48838"
+active-border-foreground = "#D48838"
 
 [popups]
-background = "#0E0A16"
+background = "#1E1610"
 background-alpha = 1.0
-text = "#D8D4E8"
+text = "#EDE0CC"
 border = "hyprland.active-border"
 border-alpha = 1.0
 border-width = 2
 
 [tooltip]
-background = "#0E0A16"
+background = "#1E1610"
 background-alpha = 0.97
-text = "#D8D4E8"
+text = "#EDE0CC"
 border = "hyprland.active-border-foreground"
 border-alpha = 1.0
 
 [notifications]
-background = "#0E0A16"
+background = "#1E1610"
 background-alpha = 1.0
-text = "#D8D4E8"
+text = "#EDE0CC"
 border = "hyprland.active-border"
 border-alpha = 1.0
 border-width = 2
-countdown = "#6858A8"
+countdown = "#D48838"
 
 [launcher]
-background = "#0E0A16"
+background = "#1E1610"
 background-alpha = 0.95
-text = "#D8D4E8"
+text = "#EDE0CC"
 border = "hyprland.active-border"
 border-alpha = 1.0
 border-width = 2
-scrim = "#0E0A16"
+scrim = "#1E1610"
 scrim-alpha = 0.5
-selected-background = "#D8D4E8"
+selected-background = "#EDE0CC"
 selected-background-alpha = 0.08
-selected-text = "#6858A8"
+selected-text = "#D48838"
 selected-border = "hyprland.active-border"
 selected-border-alpha = 0.25
 
 [menu]
-background = "#0E0A16"
+background = "#1E1610"
 background-alpha = 1.0
-text = "#D8D4E8"
+text = "#EDE0CC"
 border = "hyprland.active-border"
 border-alpha = 1.0
 border-width = 2
-scrim = "#0E0A16"
+scrim = "#1E1610"
 scrim-alpha = 0.5
-selected-background = "#D8D4E8"
+selected-background = "#EDE0CC"
 selected-background-alpha = 0.08
-selected-text = "#6858A8"
+selected-text = "#D48838"
 selected-border = "hyprland.active-border"
 selected-border-alpha = 0.25
 
 [polkit]
-background = "#0E0A16"
+background = "#1E1610"
 background-alpha = 1.0
-text = "#D8D4E8"
-text-error = "#884868"
+text = "#EDE0CC"
+text-error = "#D48838"
 border = "hyprland.active-border"
-border-error = "#884868"
+border-error = "#D48838"
 border-alpha = 1.0
 border-width = 2
-scrim = "#0E0A16"
+scrim = "#1E1610"
 scrim-alpha = 0.5
-accent = "#6858A8"
+accent = "#D48838"
 
 [lock]
-background = "#0E0A16"
+background = "#1E1610"
 background-alpha = 0.8
-text = "#D8D4E8"
-placeholder = "#D8D4E8B3"
-text-error = "#884868"
+text = "#EDE0CC"
+placeholder = "#EDE0CCB3"
+text-error = "#D48838"
 border = "hyprland.active-border"
 border-active = "hyprland.active-border"
-border-error = "#884868"
+border-error = "#D48838"
 border-alpha = 1.0
 border-width = 2
-selection = "#6858A8"
+selection = "#D48838"
 selection-alpha = 0.45
