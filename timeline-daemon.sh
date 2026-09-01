@@ -236,11 +236,22 @@ apply_phase() {
   # Check if phase already applied (skip unless forced)
   local current_phase=""
   [[ -f "$STATE_FILE" ]] && current_phase=$(cat "$STATE_FILE")
+
+  # Is timeline actually the active theme? Read once, used by both the
+  # fast-path below and the not-active guard further down.
+  local active_theme=""
+  [[ -f "$HOME/.local/state/omarchy/current/theme.name" ]] && \
+    active_theme=$(cat "$HOME/.local/state/omarchy/current/theme.name")
+
   if [[ "$current_phase" == "$phase" ]] && [[ "$TIMELINE_FORCE" != "1" ]]; then
-    # Phase unchanged — still re-apply cursor so it survives post-boot hook overwrite
-    local cursor_hook="$HOME/.config/omarchy/hooks/theme-set.d/cursor-theme-reflect.sh"
-    if [[ -f "$cursor_hook" ]]; then
-      "$cursor_hook" "timeline-${phase}" 2>/dev/null
+    # Phase unchanged — still re-apply cursor so it survives post-boot hook
+    # overwrite, but ONLY when timeline is the active theme. Otherwise this
+    # daemon would clobber whatever cursor the user's current theme set.
+    if [[ "$active_theme" == "timeline" ]]; then
+      local cursor_hook="$HOME/.config/omarchy/hooks/theme-set.d/cursor-theme-reflect.sh"
+      if [[ -f "$cursor_hook" ]]; then
+        "$cursor_hook" "timeline-${phase}" 2>/dev/null
+      fi
     fi
     return 0
   fi
@@ -283,9 +294,6 @@ apply_phase() {
 
   # If timeline isn't the active theme, just keep the theme dir updated.
   # The live apply happens when the user switches to timeline (via the hook).
-  local active_theme=""
-  [[ -f "$HOME/.local/state/omarchy/current/theme.name" ]] && \
-    active_theme=$(cat "$HOME/.local/state/omarchy/current/theme.name")
   if [[ "$active_theme" != "timeline" ]] && [[ "$TIMELINE_FORCE" != "1" ]]; then
     echo "Timeline: pre-updated theme dir for phase '$phase' (not active theme)"
     return 0
